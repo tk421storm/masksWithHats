@@ -3,7 +3,7 @@
 	<Operation Class="PatchOperationReplace">
 		<xpath>/Defs/ApparelLayerDef[defName="EyeCover"]/drawOrder</xpath>
 		<value>
-			<drawOrder>450</drawOrder>
+			<drawOrder>501</drawOrder>
 		</value>
 	</Operation>
 </Patch>

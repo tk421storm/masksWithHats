@@ -4,11 +4,11 @@ using Verse;
 namespace TKS_MasksWithHats
 {
     [DefOf]
-    public static class ApparelLayerDefOf
+    public static class TKS_ApparelLayerDefOf
     {
         public static ApparelLayerDef FaceCover;
 
-        static ApparelLayerDefOf()
+        static TKS_ApparelLayerDefOf()
         {
             DefOfHelper.EnsureInitializedInCtor(typeof(ApparelLayerDefOf));
         }
