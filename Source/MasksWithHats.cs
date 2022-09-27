@@ -3,8 +3,10 @@ using HarmonyLib;
 using RimWorld;
 using Verse;
 using UnityEngine;
+using System;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace TKS_MasksWithHats
 {
@@ -15,7 +17,38 @@ namespace TKS_MasksWithHats
 		{
 			Harmony harmony = new Harmony("TKS_MasksWithHats");
 			Harmony.DEBUG = true;
+
+			//print all that mod this function
+			var functions = new object[] { typeof(ApparelUtility).GetMethod("CanWearTogether"), typeof(PawnRenderer).GetMethod("DrawBodyApparel", BindingFlags.NonPublic | BindingFlags.Instance), typeof(PawnRenderer).GetMethod("DrawHeadHair", BindingFlags.NonPublic | BindingFlags.Instance) };
+
+			foreach (MethodBase original in functions)
+			{
+				if (original is null)
+				{
+					continue;
+				}
+
+				var patches = Harmony.GetPatchInfo(original);
+				if (patches is null)
+				{
+					Log.Message("MasksWithHats found no patches for " + original.Name);
+					continue;
+				};
+
+				Log.Message("MasksWithHats found patches for " + original.Name + ":");
+				foreach (var patch in patches.Prefixes)
+				{
+					Log.Message("index: " + patch.index);
+					Log.Message("owner: " + patch.owner);
+					Log.Message("patch method: " + patch.PatchMethod);
+					Log.Message("priority: " + patch.priority);
+					Log.Message("before: " + patch.before);
+					Log.Message("after: " + patch.after);
+				}
+			}
+
 			harmony.PatchAll();
+
 			//Harmony.DEBUG = false;
 			Log.Message($"MasksWithHats: Patching finished");
 		}
@@ -40,6 +73,13 @@ namespace TKS_MasksWithHats
 			{
 				//Log.Message("not checking body parts on " + A.defName + " or " + B.defName + " since neither include faceCover");
 				return true;
+			}
+
+			if (aProps.bodyPartGroups.Contains(faceCover) && bProps.bodyPartGroups.Contains(faceCover))
+			{
+				//Log.Message("not allowing "+A.defName+" with "+B.defName+" because they are both facecovers!")
+				__result = false;
+				return false;
 			}
 
 			if (bProps.bodyPartGroups.Contains(faceCover))
@@ -70,7 +110,7 @@ namespace TKS_MasksWithHats
 							{
 								if (faceCoverIncludes.Contains(bpr))
 								{
-									Log.Message("Not allowing apparel " + A.defName.ToString() + " with " + B.defName.ToString() + " because faceCover already covers " + bpr.Label);
+									//Log.Message("Not allowing apparel " + A.defName.ToString() + " with " + B.defName.ToString() + " because faceCover already covers " + bpr.Label);
 									__result = false;
 									return false;
 								}
@@ -92,7 +132,7 @@ namespace TKS_MasksWithHats
 		[HarmonyPrefix]
 		static bool Prefix_TryGetGraphicApparel(Apparel apparel, BodyTypeDef bodyType, ref ApparelGraphicRecord rec, ref bool __result)
 		{
-			
+
 			if (bodyType == null)
 			{
 				Log.Error("Getting apparel graphic with undefined body type.");
@@ -119,76 +159,79 @@ namespace TKS_MasksWithHats
 				__result = true;
 				return false;
 			}
-			
+
 			return true;
 		}
 	}
-	/*
-	[HarmonyPatch(typeof(PawnRenderer))]
-	static class DrawBodyApparel
-	{
 
+	[HarmonyPatch(typeof(PawnApparelGenerator))]
+	static class IsHeadgear
+	{
+		[HarmonyPatch(typeof(PawnApparelGenerator), "IsHeadgear")]
+		[HarmonyPrefix]
+		static bool IsHeadgear_prefix(ThingDef td, ref bool __result)
+		{
+			BodyPartGroupDef faceCover = TKS_MasksWithHats.BodyPartGroupDefOf.FaceCover;
+
+			if (td.apparel.bodyPartGroups.Contains(faceCover))
+			{
+				__result = true;
+				return false;
+			}
+			return true;
+		}
+	}
+
+	[HarmonyPatch(typeof(PawnRenderer), "DrawBodyApparel")]
+	public static class DrawBodyApparel
+	{
 		[HarmonyPatch(typeof(PawnRenderer), "DrawBodyApparel")]
 		[HarmonyPrefix]
 		static bool DrawBodyApparel_Prefix(PawnRenderer __instance, Pawn ___pawn, Vector3 shellLoc, Vector3 utilityLoc, Mesh bodyMesh, float angle, Rot4 bodyFacing, PawnRenderFlags flags)
 		{
-			if (!___pawn.RaceProps.Humanlike)
-            {
-				return true;
-            }
+			//if (bodyMesh is null) { Log.Warning(___pawn.Name+": DrawBodyApparel "+nameof(bodyMesh) + " is null!"); };
 
-			List<ApparelGraphicRecord> apparelGraphics = __instance?.graphics?.apparelGraphics;
-			if (apparelGraphics != null)
+			List<ApparelGraphicRecord> apparelGraphics = __instance.graphics.apparelGraphics;
+
+			BodyPartGroupDef faceCover = TKS_MasksWithHats.BodyPartGroupDefOf.FaceCover;
+			bool containsFaceCover = false;
+
+			foreach (ApparelGraphicRecord ag in apparelGraphics)
 			{
-				string apparelString = "";
+				List<BodyPartGroupDef> parts = ag.sourceApparel?.def?.apparel?.bodyPartGroups;
+				//if (parts is null) { Log.Warning(___pawn.Name + ": DrawBodyApparel apparelBodyPartGroups is null!"); };
 
-				foreach (ApparelGraphicRecord? apparelGraphicsRecord in apparelGraphics)
-                {
-					if (apparelGraphicsRecord is null)
-                    {
-						apparelString += "null, ";
-                    }
-					else
-                    {
-						ApparelGraphicRecord apparel = (ApparelGraphicRecord)apparelGraphicsRecord;
-						apparelString += apparel.sourceApparel.def.defName + ", ";
-
-                    }
-                }
-				Log.Message("drawing pawn " + ___pawn.Name + " apparel with apparel: " + apparelString);
-				//return true;
-				
-			};
-
-			Dictionary<string, object> args = new Dictionary<string, object>();
-			args.Add("shellLoc", shellLoc);
-			args.Add("utilityLoc", utilityLoc);
-			args.Add("bodyFacing", bodyFacing);
-			args.Add("angle", angle);
-			args.Add("flags", flags);
-			args.Add("bodyMesh", bodyMesh);
-
-			foreach (KeyValuePair<string, object> item in args)
-			{
-				if (item.Value is null)
+				if (ag.sourceApparel.def.apparel.bodyPartGroups.Contains(faceCover))
 				{
-					Log.Warning("found null in DrawBodyApparel: " + item.Key + ", this will probably fail!");
+					containsFaceCover = true;
 				}
 			}
-			//Log.Message("DrawBodyApparel recieved non-null arguments ok");
 
-			MethodInfo overrideMaterialIfNeeded = __instance.GetType().GetMethod("OverrideMaterialIfNeeded", BindingFlags.NonPublic | BindingFlags.Instance);
+			if (!containsFaceCover)
+			{
+				return true;
+			}
+
+			MethodInfo overrideMaterialIfNeeded = typeof(PawnRenderer).GetMethod("OverrideMaterialIfNeeded", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			//Log.Message("Overriding DrawBodyApparel for " + ___pawn + " due to facecover ");
 
 			Quaternion quaternion = Quaternion.AngleAxis(angle, Vector3.up);
 			for (int i = 0; i < apparelGraphics.Count; i++)
 			{
 				ApparelGraphicRecord apparelGraphicRecord = apparelGraphics[i];
-				Log.Message("Drawing graphics for apparelGraphic " + apparelGraphicRecord.ToString());
+				List<BodyPartGroupDef> parts = apparelGraphicRecord.sourceApparel?.def?.apparel?.bodyPartGroups;
+				if (parts is null) { Log.Warning(___pawn.Name + ": DrawBodyApparel apparelBodyPartGroups is null!"); };
+
+				if (parts.Contains(faceCover))
+				{
+					continue;
+				}
 				if (apparelGraphicRecord.sourceApparel.def.apparel.LastLayer == ApparelLayerDefOf.Shell && !apparelGraphicRecord.sourceApparel.def.apparel.shellRenderedBehindHead)
 				{
 					Material material = apparelGraphicRecord.graphic.MatAt(bodyFacing, null);
 					var parameters = new object[] { material, ___pawn, flags.FlagSet(PawnRenderFlags.Portrait) };
-					material = (flags.FlagSet(PawnRenderFlags.Cache) ? material : overrideMaterialIfNeeded.Invoke(__instance, parameters) as Material);
+					material = (flags.FlagSet(PawnRenderFlags.Cache) ? material : (Material)overrideMaterialIfNeeded.Invoke(__instance, parameters));
 					Vector3 loc = shellLoc;
 					if (apparelGraphicRecord.sourceApparel.def.apparel.shellCoversHead)
 					{
@@ -200,7 +243,7 @@ namespace TKS_MasksWithHats
 				{
 					Material material2 = apparelGraphicRecord.graphic.MatAt(bodyFacing, null);
 					var parameters = new object[] { material2, ___pawn, flags.FlagSet(PawnRenderFlags.Portrait) };
-					material2 = (flags.FlagSet(PawnRenderFlags.Cache) ? material2 : overrideMaterialIfNeeded.Invoke(__instance, parameters) as Material);
+					material2 = (flags.FlagSet(PawnRenderFlags.Cache) ? material2 : (Material)overrideMaterialIfNeeded.Invoke(__instance, parameters));
 					if (apparelGraphicRecord.sourceApparel.def.apparel.wornGraphicData != null)
 					{
 						Vector2 vector = apparelGraphicRecord.sourceApparel.def.apparel.wornGraphicData.BeltOffsetAt(bodyFacing, ___pawn.story.bodyType);
@@ -217,60 +260,41 @@ namespace TKS_MasksWithHats
 
 			return false;
 		}
-	
 	}
-	
-	[HarmonyPatch(typeof(PawnRenderer))]
-	static class DrawPawnBody 
+
+	//this function is doing something with the clothes even if you exit out of DrawBodyApparel
+	// it's supposed to just draw body clothes, but will drawn anything thats not in its "not in" layer check
+	/*
+	[HarmonyPatch(typeof(PawnRenderer), "DrawPawnBody")]
+	public static class DrawPawnBody
 	{
 		[HarmonyPatch(typeof(PawnRenderer), "DrawPawnBody")]
 		[HarmonyPrefix]
-		static bool DrawPawnBody_Prefix(Vector3 rootLoc, float angle, Rot4 facing, RotDrawMode bodyDrawType, PawnRenderFlags flags, Mesh bodyMesh)
+		static bool DrawPawnBody_Prefix(PawnRenderer __instance, Pawn ___pawn, Vector3 rootLoc, float angle, Rot4 facing, RotDrawMode bodyDrawType, ref PawnRenderFlags flags, out Mesh bodyMesh)
 		{
-			Dictionary<string, object> args = new Dictionary<string, object>();
-			args.Add("rootLoc", rootLoc);
-			args.Add("angle", angle);
-			args.Add("bodyDrawType", bodyDrawType);
-			args.Add("flags", flags);
-			//args.Add("bodyMesh", bodyMesh);
-
-			foreach (KeyValuePair<string, object> item in args)
+			if (___pawn.RaceProps.Humanlike)
 			{
-				if (item.Value is null)
-				{
-					Log.Warning("found null in DrawPawnBody: "+item.Key+", this will probably fail!");
-				}
+				bodyMesh = MeshPool.humanlikeBodySet.MeshAt(facing);
 			}
-			//Log.Message("DrawPawnBody recieved non-null arguments ok");
+			else
+			{
+				bodyMesh = __instance.graphics.nakedGraphic.MeshAt(facing);
+			}
+
+			//dont draw apparel in this method
+			//flags = flags & ~PawnRenderFlags.Clothes;
 			return true;
 		}
 	}
 	*/
-	[HarmonyPatch(typeof(PawnApparelGenerator))]
-	static class IsHeadgear
-    {
-		[HarmonyPatch(typeof(PawnApparelGenerator), "IsHeadgear")]
-		[HarmonyPrefix]
-		static bool IsHeadgear_prefix(ThingDef td, ref bool __result)
-        {
-			BodyPartGroupDef faceCover = TKS_MasksWithHats.BodyPartGroupDefOf.FaceCover;
 
-			if (td.apparel.bodyPartGroups.Contains(faceCover)) {
-				__result = true;
-				return false;
-            }
-			return true;
-        }
-    }
 
-	[HarmonyPatch(typeof(PawnRenderer), "CanUseTargetWorker")]
-	public static class Debug_Patch
+	[HarmonyPatch(typeof(PawnRenderer), "DrawHeadHair")]
+	public static class DrawHeadHair
 	{
 		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
 		{
-			bool transpilersucceeded = false;
-
-			Log.Message($"[TKSDebug] Debug_Patch Transpiler beginning");
+			Log.Message($"[MasksWithHats] DrawHeadHair Transpiler beginning");
 
 			var type = AccessTools.TypeByName("Verse.Log");
 
@@ -285,84 +309,188 @@ namespace TKS_MasksWithHats
 					methods[method.Name] = method;
 					break;
 				}
-
 			}
 
 			var debugMessage = methods["Message"];
-			
-			ParameterInfo[] parameterInfos = debugMessage.GetParameters();
 
-			int length = parameterInfos.Length;
-
-			List<object> defaultArgs = new List<object>(length);
-
-			for (int x = 0; x < length; x++)
-			{
-				defaultArgs.Add(parameterInfos[x].DefaultValue);
-			}
-			
-
-			//list of variables to report
-			List<object> opcodes = new List<object>();
-			opcodes.Add(OpCodes.Ldarg_0);
-			opcodes.Add(OpCodes.Ldarg_1);
-			opcodes.Add(OpCodes.Ldarg_2);
+			bool foundFirstOverhead = false;
+			bool foundIfStatement = false;
+			int statementStart = 0;
+			int statementEnd = 0;
+			bool insertedCode = false;
 
 			var codes = new List<CodeInstruction>(instructions);
 			for (int i = 0; i < codes.Count; i++)
 			{
 				bool yieldIt = true;
 
-				//ADD DEBUG OF VARIABLES
-				if (opcodes.Contains(codes[i].opcode))
-                {
-					string variable = codes[i].operand.ToString();
-					string message = "Function called with " + variable;
-
-					yield return codes[i];
-					yieldIt = false;
-
-					yield return new CodeInstruction(OpCodes.Ldstr, message);
-					yield return new CodeInstruction(OpCodes.Ldc_I4_1);
-					yield return new CodeInstruction(OpCodes.Call, debugMessage);
-
-				}
-
-				// ADD DEBUG TO ALL CALLS
-				
-				if (codes[i].opcode == OpCodes.Call) //                  codes[i].operand == hatsOnlyOnMap (from GetGetMethod)
+				if (!(codes[i].operand is null) && codes[i].operand.ToString().Contains("Overhead") && !foundIfStatement) //                  codes[i].operand == hatsOnlyOnMap (from GetGetMethod)
 				{
-					string caller = codes[i].operand.ToString();
-					string message = "Succesfully found call " + caller;
-					Log.Message(message);
+
+					if (foundFirstOverhead)
+					{
+						Log.Message("found if statement for copy");
+						statementStart = i - 5;
+						statementEnd = i + 3;
+
+						foundIfStatement = true;
+					}
+					else
+					{
+						foundFirstOverhead = true;
+					}
+
+				}
+				if (foundIfStatement && codes[i].opcode == OpCodes.Callvirt && !insertedCode)
+				{
+					Log.Message("Inserting check for FaceCover at line " + i.ToString());
+
+					for (int x = statementStart; x <= statementEnd; x++)
+					{
+						CodeInstruction statement = codes[x];
+
+						if (!(statement.operand is null) && statement.operand.ToString().Contains("Overhead"))
+						{
+							FieldInfo faceCover = AccessTools.Field(typeof(TKS_ApparelLayerDefOf), nameof(TKS_ApparelLayerDefOf.FaceCover));
+							CodeInstruction replacer = new CodeInstruction(OpCodes.Ldsfld, faceCover);
+
+							yield return replacer;
+						}
+						else
+						{
+							yield return statement;
+						}
+
+						insertedCode = true;
+					}
+				}
+
+				if (yieldIt)
+				{
+					yield return codes[i];
+				}
+
+			}
+			Log.Message($"[MasksWithHats] DrawHeadHair Transpiler succeeded");
+
+		}
+	}
+
+	[HarmonyPatch]
+	public class PairOverlapsAnything
+	{
+
+		static System.Reflection.MethodBase TargetMethod()
+        {
+			return AccessTools.Method(typeof(PawnApparelGenerator).GetNestedType("PossibleApparelSet", BindingFlags.NonPublic | BindingFlags.Instance), "PairOverlapsAnything");
+
+		}
+		
+		[HarmonyPrefix]
+		public static bool PairOverlapsAnything_Prefix(List<ThingStuffPair> ___aps, HashSet<ApparelUtility.LayerGroupPair> ___lgps, BodyDef ___body, ThingStuffPair pair, ref bool __result)
+		{
+			if (!___lgps.Any<ApparelUtility.LayerGroupPair>())
+			{
+				return false;
+			}
+
+			
+			BodyPartGroupDef faceCover = TKS_MasksWithHats.BodyPartGroupDefOf.FaceCover;
+
+			if (pair.thing.apparel.bodyPartGroups.Contains(faceCover)) {
+
+				bool overlaps = false;
+				foreach (ThingStuffPair otherApparel in ___aps)
+				{
+					if (otherApparel != pair)
+					{
+						if (!ApparelUtility.CanWearTogether(DefDatabase<ThingDef>.GetNamed(pair.thing.defName), DefDatabase<ThingDef>.GetNamed(pair.thing.defName), ___body))
+						{
+							overlaps = true;
+						}
+					}
+				}
+				__result = overlaps;
+				return false;
+			}
+			else
+			{
+
+				return true;
+			}
+		}
+	}
+
+	[HarmonyPatch(typeof(PawnGraphicSet), "MatsBodyBaseAt")]
+	public static class MatsBodyBaseAt
+	{
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+		{
+			Log.Message($"[MasksWithHats] MatsBodyBaseAt Transpiler beginning");
+
+			var type = AccessTools.TypeByName("Verse.Log");
+
+			Dictionary<string, MethodInfo> methods = new Dictionary<string, MethodInfo>();
+
+			//var fieldList = AccessTools.GetFieldNames(type);
+			var methodList = AccessTools.GetDeclaredMethods(type);
+			foreach (var method in methodList)
+			{
+				if (method.Name == "Message")
+				{
+					methods[method.Name] = method;
+					break;
+				}
+			}
+
+			var debugMessage = methods["Message"];
+
+			bool foundIfStatement = false;
+			int statementStart = 0;
+			int statementEnd = 0;
+
+			var codes = new List<CodeInstruction>(instructions);
+			for (int i = 0; i < codes.Count; i++)
+			{
+				bool yieldIt = true;
+
+				if (!(codes[i].operand is null) && codes[i].operand.ToString().Contains("Overhead") && !foundIfStatement) //                  codes[i].operand == hatsOnlyOnMap (from GetGetMethod)
+				{
+
+					Log.Message("found if statement for copy");
+					statementStart = i + 1;
+					statementEnd = i + 10;
+
+					foundIfStatement = true;
 
 					yield return codes[i];
 					yieldIt = false;
 
-					string debugMsg = "Succesfully ran call " + caller;
+					for (int x = statementStart; x<=statementEnd; x++)
+                    {
+						CodeInstruction statement = codes[x];
 
-					//defaultArgs[0] = debugMsg;
-					
-					//foreach (var argument in defaultArgs)
-                    //{
-					//	yield return new CodeInstruction().LoadField(typeof(argument), );
+						if (!(statement.operand is null) && statement.operand.ToString().Contains("EyeCover"))
+						{
+							FieldInfo faceCover = AccessTools.Field(typeof(TKS_ApparelLayerDefOf), nameof(TKS_ApparelLayerDefOf.FaceCover));
+							CodeInstruction replacer = new CodeInstruction(OpCodes.Ldsfld, faceCover);
 
-					//}
-					
-					yield return new CodeInstruction(OpCodes.Ldstr, debugMsg);
-					yield return new CodeInstruction(OpCodes.Ldc_I4_1);
-					yield return new CodeInstruction(OpCodes.Call, debugMessage);
+							yield return replacer;
+						}
+						else
+						{
+							yield return statement;
+						}
+					}
 
-					transpilersucceeded = true;
 				}
-				
 				if (yieldIt)
-                {
+				{
 					yield return codes[i];
 				}
-				
+
 			}
-			Log.Message($"[TKSDebug] Debug_Patch Transpiler succeeded");
+			Log.Message($"[MasksWithHats] MatsBodyBaseAt Transpiler succeeded");
 
 		}
 	}
