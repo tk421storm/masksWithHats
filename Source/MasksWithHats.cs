@@ -262,33 +262,6 @@ namespace TKS_MasksWithHats
 		}
 	}
 
-	//this function is doing something with the clothes even if you exit out of DrawBodyApparel
-	// it's supposed to just draw body clothes, but will drawn anything thats not in its "not in" layer check
-	/*
-	[HarmonyPatch(typeof(PawnRenderer), "DrawPawnBody")]
-	public static class DrawPawnBody
-	{
-		[HarmonyPatch(typeof(PawnRenderer), "DrawPawnBody")]
-		[HarmonyPrefix]
-		static bool DrawPawnBody_Prefix(PawnRenderer __instance, Pawn ___pawn, Vector3 rootLoc, float angle, Rot4 facing, RotDrawMode bodyDrawType, ref PawnRenderFlags flags, out Mesh bodyMesh)
-		{
-			if (___pawn.RaceProps.Humanlike)
-			{
-				bodyMesh = MeshPool.humanlikeBodySet.MeshAt(facing);
-			}
-			else
-			{
-				bodyMesh = __instance.graphics.nakedGraphic.MeshAt(facing);
-			}
-
-			//dont draw apparel in this method
-			//flags = flags & ~PawnRenderFlags.Clothes;
-			return true;
-		}
-	}
-	*/
-
-
 	[HarmonyPatch(typeof(PawnRenderer), "DrawHeadHair")]
 	public static class DrawHeadHair
 	{
