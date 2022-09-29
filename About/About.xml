@@ -9,7 +9,7 @@
 		<!-- the version(s) your mod supports -->
 		<li>1.3</li>
 	</supportedVersions>
-	<description>Allows masks to be worn along with hats that cover the top of the head.</description>
+	<description>Allows masks to be worn along with hats that cover (only) the top of the head.</description>
 	<modDependencies>
 		<li>
 			<packageId>brrainz.harmony</packageId>
