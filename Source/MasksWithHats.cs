@@ -16,7 +16,7 @@ namespace TKS_MasksWithHats
 		static InsertHarmony()
 		{
 			Harmony harmony = new Harmony("TKS_MasksWithHats");
-			Harmony.DEBUG = true;
+			//Harmony.DEBUG = true;
 
 			//print all that mod this function
 			var functions = new object[] { typeof(ApparelUtility).GetMethod("CanWearTogether"), typeof(PawnRenderer).GetMethod("DrawBodyApparel", BindingFlags.NonPublic | BindingFlags.Instance), typeof(PawnRenderer).GetMethod("DrawHeadHair", BindingFlags.NonPublic | BindingFlags.Instance) };
@@ -247,7 +247,7 @@ namespace TKS_MasksWithHats
 					if (apparelGraphicRecord.sourceApparel.def.apparel.wornGraphicData != null)
 					{
 						Vector2 vector = apparelGraphicRecord.sourceApparel.def.apparel.wornGraphicData.BeltOffsetAt(bodyFacing, ___pawn.story.bodyType);
-						Vector2 vector2 = apparelGraphicRecord.sourceApparel.def.apparel.wornGraphicData.BeltScaleAt(___pawn.story.bodyType);
+						Vector2 vector2 = apparelGraphicRecord.sourceApparel.def.apparel.wornGraphicData.BeltScaleAt(bodyFacing, ___pawn.story.bodyType);
 						Matrix4x4 matrix = Matrix4x4.Translate(utilityLoc) * Matrix4x4.Rotate(quaternion) * Matrix4x4.Translate(new Vector3(vector.x, 0f, vector.y)) * Matrix4x4.Scale(new Vector3(vector2.x, 1f, vector2.y));
 						GenDraw.DrawMeshNowOrLater(bodyMesh, matrix, material2, flags.FlagSet(PawnRenderFlags.DrawNow));
 					}
