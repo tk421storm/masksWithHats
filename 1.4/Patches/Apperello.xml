@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Docteur"]/apparel/bodyPartGroups</xpath>
+			<value>
+				<bodyPartGroups>
+					<li>FaceCover</li>
+				</bodyPartGroups>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Docteur"]/apparel/layers</xpath>
+			<value>
+				<layers>
+					<li>FaceCover</li>
+				</layers>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Mojo"]/apparel/bodyPartGroups</xpath>
+			<value>
+				<bodyPartGroups>
+					<li>FaceCover</li>
+				</bodyPartGroups>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Mojo"]/apparel/layers</xpath>
+			<value>
+				<layers>
+					<li>FaceCover</li>
+				</layers>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Mojotwo"]/apparel/bodyPartGroups</xpath>
+			<value>
+				<bodyPartGroups>
+					<li>FaceCover</li>
+				</bodyPartGroups>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Mojotwo"]/apparel/layers</xpath>
+			<value>
+				<layers>
+					<li>FaceCover</li>
+				</layers>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Gassy"]/apparel/bodyPartGroups</xpath>
+			<value>
+				<bodyPartGroups>
+					<li>FaceCover</li>
+				</bodyPartGroups>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Gassy"]/apparel/layers</xpath>
+			<value>
+				<layers>
+					<li>FaceCover</li>
+				</layers>
+			</value>
+		</match>
+	</Operation>
+	
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparel_Psymask"]/apparel/bodyPartGroups</xpath>
+			<value>
+				<bodyPartGroups>
+					<li>FaceCover</li>
+				</bodyPartGroups>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparel_Psymask"]/apparel/layers</xpath>
+			<value>
+				<layers>
+					<li>FaceCover</li>
+				</layers>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Quotee"]/apparel/bodyPartGroups</xpath>
+			<value>
+				<bodyPartGroups>
+					<li>FaceCover</li>
+				</bodyPartGroups>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Quotee"]/apparel/layers</xpath>
+			<value>
+				<layers>
+					<li>FaceCover</li>
+				</layers>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Bandit"]/apparel/bodyPartGroups</xpath>
+			<value>
+				<bodyPartGroups>
+					<li>FaceCover</li>
+				</bodyPartGroups>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Bandit"]/apparel/layers</xpath>
+			<value>
+				<layers>
+					<li>FaceCover</li>
+				</layers>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Wendywelder"]/apparel/bodyPartGroups</xpath>
+			<value>
+				<bodyPartGroups>
+					<li>FaceCover</li>
+				</bodyPartGroups>
+			</value>
+		</match>
+	</Operation>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Apparello 2</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="Apparello_Wendywelder"]/apparel/layers</xpath>
+			<value>
+				<layers>
+					<li>FaceCover</li>
+				</layers>
+			</value>
+		</match>
+	</Operation>
+</Patch>

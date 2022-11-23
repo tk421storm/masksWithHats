@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<ApparelLayerDef>
+		<defName>FaceCover</defName>
+		<label>face cover</label>
+		<drawOrder>500</drawOrder>
+	</ApparelLayerDef>
+
+	<BodyPartGroupDef>
+		<defName>FaceCover</defName>
+		<label>face cover</label>
+		<listOrder>201</listOrder>
+	</BodyPartGroupDef>
+</Defs>

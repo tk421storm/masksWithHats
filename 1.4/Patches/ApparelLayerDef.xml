@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+	<Operation Class="PatchOperationReplace">
+		<xpath>/Defs/ApparelLayerDef[defName="EyeCover"]/drawOrder</xpath>
+		<value>
+			<drawOrder>501</drawOrder>
+		</value>
+	</Operation>
+</Patch>
