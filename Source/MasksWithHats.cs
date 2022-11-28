@@ -69,6 +69,15 @@ namespace TKS_MasksWithHats
 			List<BodyPartRecord> faceCoverIncludes = new List<BodyPartRecord>(from x in body.AllParts where x.depth == BodyPartDepth.Outside && x.groups.Contains(faceCover) select x);
 
 
+			//dont let a pawn choose two pieces of the same clothing (fixes bugs with odd pans types: hiver, android
+
+			if (A.defName == B.defName)
+            {
+				//Log.Message("not allowing two items of the same kind to be worn by pawn");
+				__result = false;
+				return false;
+            }
+
 			if (!aProps.bodyPartGroups.Contains(faceCover) && !bProps.bodyPartGroups.Contains(faceCover))
 			{
 				//Log.Message("not checking body parts on " + A.defName + " or " + B.defName + " since neither include faceCover");
