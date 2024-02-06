@@ -4,9 +4,9 @@ using Verse;
 namespace TKS_MasksWithHats
 {
     [DefOf]
-    class BodyPartGroupDefOf
+    public static class TKS_BodyPartGroupDefOf
     {
-        static BodyPartGroupDefOf()
+        static TKS_BodyPartGroupDefOf()
         {
             DefOfHelper.EnsureInitializedInCtor(typeof(BodyPartGroupDefOf));
         }

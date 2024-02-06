@@ -31,26 +31,26 @@ namespace TKS_MasksWithHats
 				var patches = Harmony.GetPatchInfo(original);
 				if (patches is null)
 				{
-					Log.Message("MasksWithHats found no patches for " + original.Name);
+					Log.Message("[TKS_MasksWithHats]MasksWithHats found no patches for " + original.Name);
 					continue;
 				};
 
-				Log.Message("MasksWithHats found patches for " + original.Name + ":");
+				Log.Message("[TKS_MasksWithHats]MasksWithHats found patches for " + original.Name + ":");
 				foreach (var patch in patches.Prefixes)
 				{
-					Log.Message("index: " + patch.index);
-					Log.Message("owner: " + patch.owner);
-					Log.Message("patch method: " + patch.PatchMethod);
-					Log.Message("priority: " + patch.priority);
-					Log.Message("before: " + patch.before);
-					Log.Message("after: " + patch.after);
+					Log.Message("[TKS_MasksWithHats]index: " + patch.index);
+					Log.Message("[TKS_MasksWithHats]owner: " + patch.owner);
+					Log.Message("[TKS_MasksWithHats]patch method: " + patch.PatchMethod);
+					Log.Message("[TKS_MasksWithHats]priority: " + patch.priority);
+					Log.Message("[TKS_MasksWithHats]before: " + patch.before);
+					Log.Message("[TKS_MasksWithHats]after: " + patch.after);
 				}
 			}
 
 			harmony.PatchAll();
 
 			//Harmony.DEBUG = false;
-			Log.Message($"MasksWithHats: Patching finished");
+			Log.Message($"[TKS_MasksWithHats]: Patching finished");
 		}
 
 	}
@@ -65,7 +65,7 @@ namespace TKS_MasksWithHats
 			ApparelProperties aProps = A.apparel;
 			ApparelProperties bProps = B.apparel;
 
-			BodyPartGroupDef faceCover = TKS_MasksWithHats.BodyPartGroupDefOf.FaceCover;
+			BodyPartGroupDef faceCover = TKS_BodyPartGroupDefOf.FaceCover;
 			List<BodyPartRecord> faceCoverIncludes = new List<BodyPartRecord>(from x in body.AllParts where x.depth == BodyPartDepth.Outside && x.groups.Contains(faceCover) select x);
 
 
@@ -144,7 +144,7 @@ namespace TKS_MasksWithHats
 
 			if (bodyType == null)
 			{
-				Log.Error("Getting apparel graphic with undefined body type.");
+				Log.Error("[TKS_MasksWithHats]Getting apparel graphic with undefined body type.");
 				bodyType = BodyTypeDefOf.Male;
 			}
 			if (apparel.WornGraphicPath.NullOrEmpty())
@@ -180,7 +180,7 @@ namespace TKS_MasksWithHats
 		[HarmonyPrefix]
 		static bool IsHeadgear_prefix(ThingDef td, ref bool __result)
 		{
-			BodyPartGroupDef faceCover = TKS_MasksWithHats.BodyPartGroupDefOf.FaceCover;
+			BodyPartGroupDef faceCover = TKS_BodyPartGroupDefOf.FaceCover;
 
 			if (td.apparel.bodyPartGroups.Contains(faceCover))
 			{
@@ -202,7 +202,7 @@ namespace TKS_MasksWithHats
 
 			List<ApparelGraphicRecord> apparelGraphics = __instance.graphics.apparelGraphics;
 
-			BodyPartGroupDef faceCover = TKS_MasksWithHats.BodyPartGroupDefOf.FaceCover;
+			BodyPartGroupDef faceCover = TKS_BodyPartGroupDefOf.FaceCover;
 			bool containsFaceCover = false;
 
 			foreach (ApparelGraphicRecord ag in apparelGraphics)
@@ -276,7 +276,7 @@ namespace TKS_MasksWithHats
 	{
 		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
 		{
-			Log.Message($"[MasksWithHats] DrawHeadHair Transpiler beginning");
+			Log.Message($"[TKS_MasksWithHats] DrawHeadHair Transpiler beginning");
 
 			var type = AccessTools.TypeByName("Verse.Log");
 
@@ -311,7 +311,7 @@ namespace TKS_MasksWithHats
 
 					if (foundFirstOverhead)
 					{
-						Log.Message("found if statement for copy");
+						Log.Message("[TKS_MasksWithHats]found if statement for copy");
 						statementStart = i - 5;
 						statementEnd = i + 3;
 
@@ -325,7 +325,7 @@ namespace TKS_MasksWithHats
 				}
 				if (foundIfStatement && codes[i].opcode == OpCodes.Callvirt && !insertedCode)
 				{
-					Log.Message("Inserting check for FaceCover at line " + i.ToString());
+					Log.Message("[TKS_MasksWithHats]Inserting check for FaceCover at line " + i.ToString());
 
 					for (int x = statementStart; x <= statementEnd; x++)
 					{
@@ -353,7 +353,7 @@ namespace TKS_MasksWithHats
 				}
 
 			}
-			Log.Message($"[MasksWithHats] DrawHeadHair Transpiler succeeded");
+			Log.Message($"[TKS_MasksWithHats] DrawHeadHair Transpiler succeeded");
 
 		}
 	}
@@ -377,7 +377,7 @@ namespace TKS_MasksWithHats
 			}
 
 			
-			BodyPartGroupDef faceCover = TKS_MasksWithHats.BodyPartGroupDefOf.FaceCover;
+			BodyPartGroupDef faceCover = TKS_BodyPartGroupDefOf.FaceCover;
 
 			if (pair.thing.apparel.bodyPartGroups.Contains(faceCover)) {
 
@@ -408,7 +408,7 @@ namespace TKS_MasksWithHats
 	{
 		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
 		{
-			Log.Message($"[MasksWithHats] MatsBodyBaseAt Transpiler beginning");
+			Log.Message($"[TKS_MasksWithHats] MatsBodyBaseAt Transpiler beginning");
 
 			var type = AccessTools.TypeByName("Verse.Log");
 
@@ -472,8 +472,91 @@ namespace TKS_MasksWithHats
 				}
 
 			}
-			Log.Message($"[MasksWithHats] MatsBodyBaseAt Transpiler succeeded");
+			Log.Message($"[TKS_MasksWithHats] MatsBodyBaseAt Transpiler succeeded");
 
+		}
+	}
+
+	//handle vanilla apparel expanded
+	[HarmonyPatch]
+	static class Need_Anonymity_Patch
+    {
+		static MethodBase target;
+
+		static Type type;
+
+		static bool Prepare()
+        {
+			var mod = LoadedModManager.RunningMods.FirstOrDefault(m => m.Name == "Vanilla Ideology Expanded - Memes and Structures");
+			if (mod == null)
+            {
+				return false;
+            }
+
+			type = mod.assemblies.loadedAssemblies
+				.FirstOrDefault(a => a.GetName().Name == "VanillaMemesExpanded")?
+				.GetType("VanillaMemesExpanded.Need_Anonymity");
+
+			if (type == null)
+            {
+				Log.Warning("[TKS_MasksWithHats] can't patch Vanilla Ideology Memes, can't find Need_Anonymity");
+
+				return false;
+            }
+
+			target = AccessTools.DeclaredMethod(type, "NeedInterval");
+
+			if (target == null)
+            {
+				Log.Warning("[TKS_MasksWithHats] can't patch Vanilla Ideology Memes, can't find NeedInterval method");
+
+				return false;
+			}
+
+			return true;
+        }
+
+		static MethodBase TargetMethod()
+        {
+			return target;
+        }
+
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+		{
+			var codes = new List<CodeInstruction>(instructions);
+
+			bool foundIfStatement = false;
+			int statementStart = 0;
+			int statementEnd = 0;
+
+			for (int i = 0; i < codes.Count; i++)
+            {
+				bool yieldIt = true;
+
+				if (!(codes[i].operand is null) && codes[i].operand.ToString().Contains("FullHead") && !foundIfStatement) //                  codes[i].operand == hatsOnlyOnMap (from GetGetMethod)
+				{
+
+					Log.Message("[TKS_MasksWithHats] found if statement to replace with FaceCover");
+					statementStart = i + 1;
+					statementEnd = i + 10;
+
+					foundIfStatement = true;
+					yieldIt = false;
+
+					FieldInfo faceCover = AccessTools.Field(typeof(TKS_BodyPartGroupDefOf), nameof(TKS_BodyPartGroupDefOf.FaceCover));
+					CodeInstruction replacer = new CodeInstruction(OpCodes.Ldsfld, faceCover);
+
+					yield return replacer;
+				}
+
+
+				if (yieldIt)
+				{
+					yield return codes[i];
+				}
+
+			}
+			Log.Message($"[TKS_MasksWithHats] Vanilla Ideology Expanded Transpiler succeeded");
 		}
 	}
 }
