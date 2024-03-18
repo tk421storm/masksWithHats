@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<Patch>
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/PreceptDef/roleApparelRequirements/li/requirement[requiredDefs="Apparel_WarMask"]/bodyPartGroupsMatchAny/li</xpath>
+		<value>
+			<li>FaceCover</li>
+		</value>
+	</Operation>
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/PreceptDef/roleApparelRequirements/li/requirement[requiredDefs="Apparel_VisageMask"]/bodyPartGroupsMatchAny/li</xpath>
+		<value>
+			<li>FaceCover</li>
+		</value>
+	</Operation>
+</Patch>
+
