@@ -191,6 +191,7 @@ namespace TKS_MasksWithHats
 		}
 	}
 
+#if v1_4
 	[HarmonyPatch(typeof(PawnRenderer), "DrawBodyApparel")]
 	public static class DrawBodyApparel
 	{
@@ -270,6 +271,7 @@ namespace TKS_MasksWithHats
 			return false;
 		}
 	}
+
 
 	[HarmonyPatch(typeof(PawnRenderer), "DrawHeadHair")]
 	public static class DrawHeadHair
@@ -358,6 +360,7 @@ namespace TKS_MasksWithHats
 		}
 	}
 
+#endif
 	[HarmonyPatch]
 	public class PairOverlapsAnything
 	{
@@ -403,6 +406,7 @@ namespace TKS_MasksWithHats
 		}
 	}
 
+#if v1_4
 	[HarmonyPatch(typeof(PawnGraphicSet), "MatsBodyBaseAt")]
 	public static class MatsBodyBaseAt
 	{
@@ -476,6 +480,7 @@ namespace TKS_MasksWithHats
 
 		}
 	}
+#endif
 
 	//handle vanilla apparel expanded
 	[HarmonyPatch]
