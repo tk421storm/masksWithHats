@@ -88,6 +88,7 @@
     <Content Include="1.4\Patches\PatchReplace.xml" />
     <Content Include="1.4\Patches\VPE.xml" />
     <Content Include="1.5\Defs\ApparelLayerDefs.xml" />
+    <Content Include="1.5\Languages\English\Keyed\Keys.xml" />
     <Content Include="1.5\Patches\ApparelLayerDef.xml" />
     <Content Include="1.5\Patches\Apperello.xml" />
     <Content Include="1.5\Patches\Biotech.xml" />
@@ -102,7 +103,6 @@
     <Folder Include="1.3\Assemblies\" />
     <Folder Include="1.3\Languages\" />
     <Folder Include="1.4\Languages\" />
-    <Folder Include="1.5\Languages\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

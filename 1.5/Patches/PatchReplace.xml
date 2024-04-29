@@ -49,5 +49,21 @@
 			</layers>
 		</value>
 	</Operation>
+	<Operation Class="PatchOperationReplace">
+		<xpath>/Defs/ThingDef[defName="Apparel_CultistMask"]/apparel/layers</xpath>
+		<value>
+			<layers>
+				<li>FaceCover</li>
+			</layers>
+		</value>
+	</Operation>
+	<Operation Class="PatchOperationReplace">
+		<xpath>/Defs/ThingDef[defName="Apparel_CultistMask"]/apparel/bodyPartGroups</xpath>
+		<value>
+			<bodyPartGroups>
+				<li>FaceCover</li>
+			</bodyPartGroups>
+		</value>
+	</Operation>
 </Patch>
 

@@ -55,7 +55,55 @@ namespace TKS_MasksWithHats
 
 	}
 
-	[HarmonyPatch(typeof(ApparelUtility))]
+	public class TKS_MasksWithHatsSettings : ModSettings
+	{
+		public bool debugPrint = false;
+
+		public override void ExposeData()
+		{
+			Scribe_Values.Look(ref debugPrint, "debugPrint");
+
+			base.ExposeData();
+		}
+	}
+
+	public class TKS_MasksWithHatsMod : Mod
+	{
+		TKS_MasksWithHatsSettings settings;
+
+		public static void DebugMessage(string message)
+		{
+			if (LoadedModManager.GetMod<TKS_MasksWithHatsMod>().GetSettings<TKS_MasksWithHatsSettings>().debugPrint)
+			{
+				Log.Message(message);
+			}
+		}
+
+
+		public TKS_MasksWithHatsMod(ModContentPack content) : base(content)
+		{
+			this.settings = GetSettings<TKS_MasksWithHatsSettings>();
+		}
+
+		private string editBufferFloat;
+
+		public override void DoSettingsWindowContents(Rect inRect)
+		{
+			Listing_Standard listingStandard = new Listing_Standard();
+			listingStandard.Begin(inRect);
+			listingStandard.CheckboxLabeled("TKSDebugPrint".Translate(), ref settings.debugPrint);
+			listingStandard.End();
+			base.DoSettingsWindowContents(inRect);
+		}
+
+		public override string SettingsCategory()
+		{
+			return "TKSMasksWithHatsName".Translate();
+		}
+	}
+
+
+		[HarmonyPatch(typeof(ApparelUtility))]
 	static class CanWearTogether
 	{
 		[HarmonyPatch(typeof(ApparelUtility), "CanWearTogether")]
@@ -68,47 +116,50 @@ namespace TKS_MasksWithHats
 			BodyPartGroupDef faceCover = TKS_BodyPartGroupDefOf.FaceCover;
 			List<BodyPartRecord> faceCoverIncludes = new List<BodyPartRecord>(from x in body.AllParts where x.depth == BodyPartDepth.Outside && x.groups.Contains(faceCover) select x);
 
+			TKS_MasksWithHatsMod.DebugMessage("checking CanWearTogether for (" + A.defName + ", " + B.defName + ")");
 
 			//dont let a pawn choose two pieces of the same clothing (fixes bugs with odd pans types: hiver, android
 
 			if (A.defName == B.defName)
             {
-				//Log.Message("not allowing two items of the same kind to be worn by pawn");
+				TKS_MasksWithHatsMod.DebugMessage("not allowing two items of the same kind to be worn by pawn ("+A.defName+", "+B.defName+")");
 				__result = false;
 				return false;
             }
 
-			if (!aProps.bodyPartGroups.Contains(faceCover) && !bProps.bodyPartGroups.Contains(faceCover))
+			
+			//if (!aProps.bodyPartGroups.Contains(faceCover) && !bProps.bodyPartGroups.Contains(faceCover))
+			if (!aProps.layers.Contains(TKS_ApparelLayerDefOf.FaceCover) && !bProps.layers.Contains(TKS_ApparelLayerDefOf.FaceCover))
 			{
-				//Log.Message("not checking body parts on " + A.defName + " or " + B.defName + " since neither include faceCover");
+				//TKS_MasksWithHatsMod.DebugMessage("not checking body parts on " + A.defName + " or " + B.defName + " since neither include faceCover");
 				return true;
 			}
 
-			if (aProps.bodyPartGroups.Contains(faceCover) && bProps.bodyPartGroups.Contains(faceCover))
+			if (aProps.layers.Contains(TKS_ApparelLayerDefOf.FaceCover) && bProps.layers.Contains(TKS_ApparelLayerDefOf.FaceCover))
 			{
-				//Log.Message("not allowing "+A.defName+" with "+B.defName+" because they are both facecovers!")
+				TKS_MasksWithHatsMod.DebugMessage("not allowing " + A.defName + " with " + B.defName + " because they are both facecovers (" + A.defName + ", " + B.defName + ")");
 				__result = false;
 				return false;
 			}
 
-			if (bProps.bodyPartGroups.Contains(faceCover))
+			if (bProps.layers.Contains(TKS_ApparelLayerDefOf.FaceCover))
 			{
 				//swap em
 				ThingDef C = A;
 				A = B;
 				B = C;
 			}
-			//Log.Message("Checking if " + A.defName + " can be worn with " + B.defName);
+			TKS_MasksWithHatsMod.DebugMessage("Checking if " + A.defName + " can be worn with " + B.defName);
 			aProps = A.apparel;
 			bProps = B.apparel;
-			//Log.Message(A.defName + "has the following bodyPartGroups: " + aProps.bodyPartGroups.ToStringSafeEnumerable());
+			TKS_MasksWithHatsMod.DebugMessage(A.defName + "has the following bodyPartGroups: " + aProps.bodyPartGroups.ToStringSafeEnumerable());
 			foreach (BodyPartGroupDef group in aProps.bodyPartGroups)
 			{
-				//Log.Message("Checking body part group " + group.defName);
+				TKS_MasksWithHatsMod.DebugMessage("Checking body part group " + group.defName);
 				if (group.defName == "FaceCover")
 				{
 					//check that other apparel does not include bits that FaceCover includes
-					//Log.Message("faceCoverIncludes: " + faceCoverIncludes.ToStringSafeEnumerable());
+					TKS_MasksWithHatsMod.DebugMessage("faceCoverIncludes: " + faceCoverIncludes.ToStringSafeEnumerable());
 
 					foreach (BodyPartGroupDef groupDef in bProps.bodyPartGroups)
 					{
@@ -119,13 +170,13 @@ namespace TKS_MasksWithHats
 							{
 								if (faceCoverIncludes.Contains(bpr))
 								{
-									//Log.Message("Not allowing apparel " + A.defName.ToString() + " with " + B.defName.ToString() + " because faceCover already covers " + bpr.Label);
+									TKS_MasksWithHatsMod.DebugMessage("Not allowing apparel " + A.defName.ToString() + " with " + B.defName.ToString() + " because faceCover already covers " + bpr.Label);
 									__result = false;
 									return false;
 								}
 							}
 						}
-						//Log.Message("Allowing apparel " + A.defName.ToString() + " beacuse list " + aProps.GetCoveredOuterPartsString(body) + " doesn't include any of " + bProps.GetCoveredOuterPartsString(body));
+						TKS_MasksWithHatsMod.DebugMessage("Allowing apparel " + A.defName.ToString() + " beacuse list " + aProps.GetCoveredOuterPartsString(body) + " doesn't include any of " + bProps.GetCoveredOuterPartsString(body));
 					}
 				}
 
@@ -155,7 +206,7 @@ namespace TKS_MasksWithHats
 			string path;
 			if (apparel.def.apparel.LastLayer == TKS_MasksWithHats.TKS_ApparelLayerDefOf.FaceCover)
 			{
-				//Log.Message("Getting apparel graphic for FaceMask object " + apparel.def.defName);
+				TKS_MasksWithHatsMod.DebugMessage("Getting apparel graphic for FaceMask object " + apparel.def.defName);
 				path = apparel.WornGraphicPath;
 				Shader shader = ShaderDatabase.Cutout;
 				if (apparel.def.apparel.useWornGraphicMask)
@@ -164,7 +215,7 @@ namespace TKS_MasksWithHats
 				}
 				Graphic graphic = GraphicDatabase.Get<Graphic_Multi>(path, shader, apparel.def.graphicData.drawSize, apparel.DrawColor);
 				rec = new ApparelGraphicRecord(graphic, apparel);
-				//Log.Message("returning graphic for FaceMask object: " + graphic.ToString());
+				TKS_MasksWithHatsMod.DebugMessage("returning graphic for FaceMask object: " + graphic.ToString());
 				__result = true;
 				return false;
 			}
@@ -224,7 +275,7 @@ namespace TKS_MasksWithHats
 
 			MethodInfo overrideMaterialIfNeeded = typeof(PawnRenderer).GetMethod("OverrideMaterialIfNeeded", BindingFlags.NonPublic | BindingFlags.Instance);
 
-			//Log.Message("Overriding DrawBodyApparel for " + ___pawn + " due to facecover ");
+			TKS_MasksWithHatsMod.DebugMessage("Overriding DrawBodyApparel for " + ___pawn + " due to facecover ");
 
 			Quaternion quaternion = Quaternion.AngleAxis(angle, Vector3.up);
 			for (int i = 0; i < apparelGraphics.Count; i++)
@@ -481,6 +532,71 @@ namespace TKS_MasksWithHats
 		}
 	}
 #endif
+	//handle show hair under hats
+	[HarmonyPatch]
+	static class ShowHair_Patch
+	{
+		static MethodBase target;
+
+		static Type type;
+
+		static bool Prepare()
+		{
+			var mod = LoadedModManager.RunningMods.FirstOrDefault(m => m.PackageId == "cat2002.showhair");
+			if (mod == null)
+			{
+				Log.Message("[TKS_MasksWithHats] can't patch Show Hair With Hats or Hide All Hats, can't find mod");
+				return false;
+			}
+
+			type = mod.assemblies.loadedAssemblies
+				.FirstOrDefault(a => a.GetName().Name == "ShowHair")?
+				.GetType("ShowHair.Settings");
+
+			if (type == null)
+			{
+				Log.Message("[TKS_MasksWithHats] can't patch Show Hair With Hats or Hide All Hats, can't find Settings");
+
+				return false;
+			}
+
+			target = AccessTools.DeclaredMethod(type, "IsHeadwear");
+
+			if (target == null)
+			{
+				Log.Message("[TKS_MasksWithHats] can't patch Show Hair With Hats or Hide All Hats, can't find Settings.IsHeadwear");
+
+				return false;
+			}
+
+			Log.Message("[TKS_MasksWithHats] patched Show Hair With Hats or Hide All Hats");
+			return true;
+		}
+
+		static MethodBase TargetMethod()
+		{
+			return target;
+		}
+
+		[HarmonyPrefix]
+		public static bool IsHeadwear_Prefix(ApparelProperties apparelProperties, ref bool __result)
+		{
+			if (apparelProperties == null)
+			{
+				__result = false;
+				return false;
+			}
+
+			if (apparelProperties.LastLayer == TKS_ApparelLayerDefOf.FaceCover)
+			{
+				__result = true;
+				return false;
+			}
+
+			return true;
+		}
+	}
+
 
 	//handle vanilla apparel expanded
 	[HarmonyPatch]
@@ -504,7 +620,7 @@ namespace TKS_MasksWithHats
 
 			if (type == null)
             {
-				Log.Warning("[TKS_MasksWithHats] can't patch Vanilla Ideology Memes, can't find Need_Anonymity");
+				Log.Message("[TKS_MasksWithHats] can't patch Vanilla Ideology Memes, can't find Need_Anonymity");
 
 				return false;
             }
