@@ -38,6 +38,16 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '1.6|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>1.6\Assemblies\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;v1_6</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>portable</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\workshop\content\294100\2009463077\Current\Assemblies\0Harmony.dll</HintPath>
@@ -97,6 +107,16 @@
     <Content Include="1.5\Patches\PatchReplace.xml" />
     <Content Include="1.5\Patches\PatchRoleApparel.xml" />
     <Content Include="1.5\Patches\VPE.xml" />
+    <Content Include="1.6\Defs\ApparelLayerDefs.xml" />
+    <Content Include="1.6\Languages\English\Keyed\Keys.xml" />
+    <Content Include="1.6\Patches\ApparelLayerDef.xml" />
+    <Content Include="1.6\Patches\Apperello.xml" />
+    <Content Include="1.6\Patches\Biotech.xml" />
+    <Content Include="1.6\Patches\Bodies_Humanlike.xml" />
+    <Content Include="1.6\Patches\Medieval.xml" />
+    <Content Include="1.6\Patches\PatchReplace.xml" />
+    <Content Include="1.6\Patches\PatchRoleApparel.xml" />
+    <Content Include="1.6\Patches\VPE.xml" />
     <Content Include="About\About.xml" />
   </ItemGroup>
   <ItemGroup>

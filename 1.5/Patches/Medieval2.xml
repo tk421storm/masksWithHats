@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>Vanilla Factions Expanded - Medieval</li>
+		</mods>
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="VFEM2_Apparel_PlagueMask"]/apparel/bodyPartGroups</xpath>
+			<value>
+				<bodyPartGroups>
+					<li>FaceCover</li>
+				</bodyPartGroups>
+			</value>
+		</match>
+	</Operation>
+		<Operation Class="PatchOperationFindMod">
+			<mods>
+				<li>Vanilla Factions Expanded - Medieval</li>
+			</mods>
+			
+		<match Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="VFEM2_Apparel_PlagueMask"]/apparel/layers</xpath>
+			<value>
+				<layers>
+					<li>FaceCover</li>
+				</layers>
+			</value>
+		</match>
+	</Operation>
+</Patch>
