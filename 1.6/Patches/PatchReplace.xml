@@ -49,7 +49,7 @@
 			</layers>
 		</value>
 	</Operation>
-	<Operation Class="PatchOperationReplace">
+	<Operation Class="PatchOperationReplace" MayRequire="ludeon.rimworld.anomaly" >
 		<xpath>/Defs/ThingDef[defName="Apparel_CultistMask"]/apparel/layers</xpath>
 		<value>
 			<layers>
@@ -57,7 +57,7 @@
 			</layers>
 		</value>
 	</Operation>
-	<Operation Class="PatchOperationReplace">
+	<Operation Class="PatchOperationReplace" MayRequire="ludeon.rimworld.anomaly" >
 		<xpath>/Defs/ThingDef[defName="Apparel_CultistMask"]/apparel/bodyPartGroups</xpath>
 		<value>
 			<bodyPartGroups>
